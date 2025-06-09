@@ -15,7 +15,7 @@ export default function DeviceCard({ device, onPress }: DeviceCardProps) {
 
   const handleViewMore = () => {
     router.push({
-      pathname: "/device/[id]",
+      pathname: "/(root)/device/[id]",
       params: { id: device.id }
     });
   };
