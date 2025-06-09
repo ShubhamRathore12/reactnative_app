@@ -67,12 +67,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   nativeGradient: {
-    backgroundColor: "#1E3A8A",
+    backgroundColor: Colors.coffeeTheme.background,
     justifyContent: "center",
     alignItems: "center",
   },
   logoContainer: {
     alignItems: "center",
+
   },
   logo: {
     width: 120,

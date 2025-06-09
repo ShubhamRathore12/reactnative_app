@@ -1,4 +1,3 @@
-import Map from "@/components/Map";
 import { Colors } from "@/constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -73,7 +72,7 @@ export default function DashboardScreen() {
             </View>
             <Text style={styles.activityTitle}>Trigger/Report Activity</Text>
           </View>
-          <View style={styles.activityContent}><Map/></View>
+          {/* <View style={styles.activityContent}><Map/></View> */}
         </View>
 
         <View style={styles.activityCard}>
