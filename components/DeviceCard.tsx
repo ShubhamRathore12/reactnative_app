@@ -4,7 +4,6 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-
 interface DeviceCardProps {
   device: Device | any;
   onPress: (device: Device) => void;
@@ -14,10 +13,8 @@ export default function DeviceCard({ device, onPress }: DeviceCardProps) {
   const router = useRouter();
 
   const handleViewMore = () => {
-    router.push({
-      pathname: "/(root)/device/[id]",
-      params: { id: device.id }
-    });
+    // Fix: Use string template for the path instead of object with pathname
+    router.push(`/(root)/device/${device.id}` as any);
   };
 
   // ✅ Safely check each status — default is false (RED)
