@@ -14,10 +14,8 @@ export default function DeviceCard({ device, onPress }: DeviceCardProps) {
   const router = useRouter();
 
   const handleViewMore = () => {
-    router.push({
-      pathname: "/device/[id]",
-      params: { id: device.id }
-    });
+    // Fix: Use string template for the path instead of object with pathname
+    router.push(`/(root)/device/${device.id}` as any);
   };
 
   // ✅ Safely check each status — default is false (RED)
