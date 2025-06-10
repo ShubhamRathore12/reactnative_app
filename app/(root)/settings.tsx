@@ -3,13 +3,13 @@ import { ThemeType, useThemeStore } from '@/store/themeStore';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 const themeOptions: { key: ThemeType; name: string; colors: string[] }[] = [
