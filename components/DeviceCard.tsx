@@ -13,9 +13,17 @@ export default function DeviceCard({ device, onPress }: DeviceCardProps) {
   const router = useRouter();
 
   const handleViewMore = () => {
-    // Fix: Use string template for the path instead of object with pathname
-    router.push(`/(root)/device/${device.id}` as any);
+    if (!device?.id) {
+      alert("Device ID is missing");
+      return;
+    }
+  
+    router.push({
+      pathname: "/device/[id]",
+      params: { id: device.id.toString() },
+    });
   };
+  
 
   // ✅ Safely check each status — default is false (RED)
   const isMachineRunning = device.machineStatus === "Running" ? true : false;
