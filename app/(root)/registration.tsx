@@ -123,6 +123,7 @@ const Dropdown = ({ label, placeholder, options, value, onChange, isOpen, setIsO
 
 // Import TextInput
 import { TextInput } from "react-native"
+import Toast from "react-native-toast-message"
 
 interface FormValues {
   accountType: string
@@ -204,34 +205,46 @@ export default function RegistrationScreen() {
     monitorAccess: [],
   }
 
-  const handleSubmit = async (values: FormValues) => {
+  const handleSubmit = async (values: FormValues, { resetForm }: any) => {
     try {
       const payload = {
         ...values,
-    
         monitorAccess: values.monitorAccess,
-      }
-
+      };
+  
       const response = await fetch("https://grain-backend.onrender.com/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      })
-
-      const data = await response.json()
-
+      });
+  
+      const data = await response.json();
+  
       if (response.ok) {
-        console.log("Success:", data)
-        // Handle successful registration
+        Toast.show({
+          type: "success",
+          text1: "Registration Successful",
+          text2: "You can now login.",
+        });
+  
+        resetForm(); // ✅ Reset form to initial values
       } else {
-        console.error("Registration error:", data.message)
-        // Handle registration error
+        Toast.show({
+          type: "error",
+          text1: "Registration Failed",
+          text2: data.message || "Please try again later.",
+        });
       }
     } catch (error) {
-      console.error("Error submitting form", error)
-      // Handle network error
+      console.error("Error submitting form", error);
+      Toast.show({
+        type: "error",
+        text1: "Network Error",
+        text2: "Please check your connection.",
+      });
     }
-  }
+  };
+  
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
@@ -241,8 +254,12 @@ export default function RegistrationScreen() {
             <Text style={styles.formTitle}>Create Account</Text>
             <Text style={styles.formSubtitle}>Fill in your details to register</Text>
           </View>
+          <Formik<FormValues>
+  initialValues={initialValues}
+  validationSchema={validationSchema}
+  onSubmit={(values, formikHelpers) => handleSubmit(values, formikHelpers)}
+>
 
-          <Formik<FormValues> initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
             {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting, setFieldValue }) => (
               <View style={styles.form}>
                 {/* Account Type */}
@@ -533,6 +550,7 @@ const styles = StyleSheet.create({
   },
   inputWrapperFocused: {
     borderColor: Colors.coffeeTheme.primary,
+    borderWidth: 2, // 🔥 Emphasize input focus
     backgroundColor: "#FFFFFF",
     shadowColor: Colors.coffeeTheme.primary,
     shadowOffset: { width: 0, height: 0 },
@@ -540,6 +558,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 1,
   },
+  
   inputWrapperError: {
     borderColor: "#EF4444",
   },
