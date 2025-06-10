@@ -1,5 +1,5 @@
-import { Colors } from "@/constants/Colors";
 import { Device } from "@/types";
+import { useThemeStore } from "@/store/themeStore";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -11,6 +11,8 @@ interface DeviceCardProps {
 
 export default function DeviceCard({ device, onPress }: DeviceCardProps) {
   const router = useRouter();
+  const { getColors } = useThemeStore();
+  const colors = getColors();
 
   const handleViewMore = () => {
     if (!device?.id) {
@@ -18,18 +20,24 @@ export default function DeviceCard({ device, onPress }: DeviceCardProps) {
       return;
     }
   
-    router.push({
-      pathname: "/device/[id]",
-      params: { id: device.id.toString() },
-    });
+    try {
+      router.push({
+        pathname: "/(root)/device/[id]/index" as any,
+        params: { id: device.id.toString() },
+      });
+    } catch (error) {
+      console.error("Navigation error:", error);
+      alert("Failed to navigate to device details");
+    }
   };
-  
 
   // ✅ Safely check each status — default is false (RED)
   const isMachineRunning = device.machineStatus === "Running" ? true : false;
   const isInternetConnected =
     device.internetStatus === "Connected" ? true : false;
   const isCoolingActive = device.coolingStatus === "Active" ? true : false;
+
+  const styles = createStyles(colors);
 
   return (
     <View style={styles.container}>
@@ -38,9 +46,9 @@ export default function DeviceCard({ device, onPress }: DeviceCardProps) {
 
       {/* Status Section */}
       <View style={styles.statusContainer}>
-        <StatusItem label="Machine" active={isMachineRunning} />
-        <StatusItem label="Internet" active={isInternetConnected} />
-        <StatusItem label="Cooling" active={isCoolingActive} />
+        <StatusItem label="Machine" active={isMachineRunning} colors={colors} />
+        <StatusItem label="Internet" active={isInternetConnected} colors={colors} />
+        <StatusItem label="Cooling" active={isCoolingActive} colors={colors} />
       </View>
 
       {/* Buttons */}
@@ -58,10 +66,10 @@ export default function DeviceCard({ device, onPress }: DeviceCardProps) {
 }
 
 // 🔥 Small component for status with dot
-function StatusItem({ label, active }: { label: string; active: boolean }) {
+function StatusItem({ label, active, colors }: { label: string; active: boolean; colors: any }) {
   return (
     <View style={styles.statusItem}>
-      <Text style={styles.statusText}>{label} Status</Text>
+      <Text style={[styles.statusText, { color: colors.textLight }]}>{label} Status</Text>
       <View
         style={[
           styles.statusDot,
@@ -72,9 +80,9 @@ function StatusItem({ label, active }: { label: string; active: boolean }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -97,7 +105,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 8,
-    color: "#1F2937",
+    color: colors.text,
   },
   statusContainer: {
     marginBottom: 16,
@@ -109,7 +117,6 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 14,
-    color: "#6B7280",
     marginRight: 8,
   },
   statusDot: {
@@ -125,13 +132,30 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: Colors.light.border,
+    borderColor: colors.border,
     borderRadius: 6,
     alignItems: "center",
   },
   buttonText: {
-    color: "#374151",
+    color: colors.text,
     fontSize: 14,
     fontWeight: "500",
+  },
+});
+
+const styles = StyleSheet.create({
+  statusItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  statusText: {
+    fontSize: 14,
+    marginRight: 8,
+  },
+  statusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
 });

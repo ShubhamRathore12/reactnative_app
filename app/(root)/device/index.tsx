@@ -2,8 +2,8 @@ import plc1 from "@/assets/images/1200.jpg";
 import plc2 from "@/assets/images/200.jpg";
 import DeviceCard from "@/components/DeviceCard";
 import { Device } from "@/types";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuthStore } from "@/store/authStore";
+import { useThemeStore } from "@/store/themeStore";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
@@ -34,6 +34,10 @@ const locations = ["All Locations", "Location 1", "Location 2"];
 const companies = ["All Companies", "Company A", "Company B"];
 
 export default function DevicesScreen() {
+  const { user } = useAuthStore();
+  const { getColors } = useThemeStore();
+  const colors = getColors();
+  
   const [selectedLocation, setSelectedLocation] = useState("All Locations");
   const [selectedCompany, setSelectedCompany] = useState("All Companies");
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
@@ -41,18 +45,9 @@ export default function DevicesScreen() {
 
   const handleDevicePress = (device: Device) => {
     console.log("Device pressed:", device);
-    // Navigate to device details or perform another action
   };
-  const [storedData, setStoredData] = useState<any>(null);
 
-  useEffect(() => {
-    (async () => {
-      const storedValue = await AsyncStorage.getItem("value");
-      if (storedValue) {
-        setStoredData(JSON.parse(storedValue));
-      }
-    })();
-  }, []);
+  const styles = createStyles(colors);
 
   return (
     <View style={styles.container}>
@@ -73,7 +68,7 @@ export default function DevicesScreen() {
           {isLocationDropdownOpen && (
             <View style={styles.dropdownMenu}>
               {locations
-                .filter((location) => location !== storedData?.user?.location) // ✅ Fix
+                .filter((location) => location !== user?.location)
                 .map((location) => (
                   <TouchableOpacity
                     key={location}
@@ -103,7 +98,7 @@ export default function DevicesScreen() {
           {isCompanyDropdownOpen && (
             <View style={styles.dropdownMenu}>
               {companies
-                .filter((company) => company !== storedData?.user?.company) // ✅ Fix
+                .filter((company) => company !== user?.company)
                 .map((company) => (
                   <TouchableOpacity
                     key={company}
@@ -135,16 +130,16 @@ export default function DevicesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: colors.background,
     padding: 16,
   },
   pageTitle: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#1F2937",
+    color: colors.text,
     marginBottom: 24,
   },
   filtersContainer: {
@@ -159,7 +154,7 @@ const styles = StyleSheet.create({
   filterLabel: {
     fontSize: 14,
     fontWeight: "500",
-    color: "#4B5563",
+    color: colors.textLight,
     marginBottom: 8,
   },
   dropdown: {
@@ -167,28 +162,28 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 12,
-    backgroundColor: "white",
+    backgroundColor: colors.card,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: colors.border,
   },
   dropdownText: {
     fontSize: 14,
-    color: "#1F2937",
+    color: colors.text,
   },
   dropdownIcon: {
     fontSize: 12,
-    color: "#6B7280",
+    color: colors.textLight,
   },
   dropdownMenu: {
     position: "absolute",
     top: 76,
     left: 0,
     right: 0,
-    backgroundColor: "white",
+    backgroundColor: colors.card,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: colors.border,
     elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -199,11 +194,11 @@ const styles = StyleSheet.create({
   dropdownItem: {
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    borderBottomColor: colors.border,
   },
   dropdownItemText: {
     fontSize: 14,
-    color: "#1F2937",
+    color: colors.text,
   },
   deviceList: {
     paddingBottom: 20,

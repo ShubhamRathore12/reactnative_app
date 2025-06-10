@@ -1,8 +1,8 @@
 import appLogo from "@/assets/images/revenue-i4.png";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import { Colors } from "@/constants/Colors";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuthStore } from "@/store/authStore";
+import { useThemeStore } from "@/store/themeStore";
 import { useRouter } from "expo-router";
 import { Formik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
@@ -31,6 +31,10 @@ const loginSchema = Yup.object().shape({
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { login } = useAuthStore();
+  const { getColors } = useThemeStore();
+  const colors = getColors();
+  
   const [loginError, setLoginError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   
@@ -122,9 +126,8 @@ export default function LoginScreen() {
       }
 
       if (data?.token && data?.user) {
-        await AsyncStorage.setItem("value", JSON.stringify(data));
-        // Success animation could be added here
-        router.replace("/dashboard");
+        login(data);
+        router.replace("/(root)/dashboard");
       } else {
         setLoginError("Unexpected response from server. Please try again.");
         shakeError();
@@ -139,6 +142,8 @@ export default function LoginScreen() {
       setIsLoading(false);
     }
   };
+
+  const styles = createStyles(colors);
 
   return (
     <>
@@ -271,14 +276,14 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     minHeight: height,
   },
   container: {
     flex: 1,
-    backgroundColor: Colors.coffeeTheme.background,
+    backgroundColor: colors.background,
     position: 'relative',
   },
   backgroundGradient: {
@@ -306,8 +311,8 @@ const styles = StyleSheet.create({
     height: 140,
     borderRadius: 70,
     borderWidth: 4,
-    borderColor: '#4f46e5',
-    shadowColor: '#4f46e5',
+    borderColor: colors.primary,
+    shadowColor: colors.primary,
     shadowOffset: {
       width: 0,
       height: 8,
@@ -323,7 +328,7 @@ const styles = StyleSheet.create({
     right: -10,
     bottom: -10,
     borderRadius: 80,
-    backgroundColor: '#4f46e5',
+    backgroundColor: colors.primary,
     opacity: 0.1,
   },
   logoText: {
@@ -347,7 +352,7 @@ const styles = StyleSheet.create({
   formContainer: {
     paddingHorizontal: 32,
     flex: 1,
-    backgroundColor: Colors.coffeeTheme.background,
+    backgroundColor: colors.background,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingTop: 40,
@@ -368,13 +373,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#1F2937",
+    color: colors.text,
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: "#6B7280",
+    color: colors.textLight,
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -392,7 +397,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     fontSize: 16,
-    color:"black"
+    color: colors.text,
   },
   errorContainer: {
     backgroundColor: "#fee2e2",
@@ -420,10 +425,10 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   loginButton: {
-    backgroundColor: Colors.coffeeTheme.primary,
+    backgroundColor: colors.primary,
     borderRadius: 16,
     paddingVertical: 18,
-    shadowColor: '#4f46e5',
+    shadowColor: colors.primary,
     shadowOffset: {
       width: 0,
       height: 4,
@@ -437,7 +442,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   footerText: {
-    color: '#9ca3af',
+    color: colors.textLight,
     fontSize: 12,
     letterSpacing: 1,
     textTransform: 'uppercase',
