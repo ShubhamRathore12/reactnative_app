@@ -1,4 +1,5 @@
-import { Colors } from "@/constants/Colors";
+import { useAuthStore } from "@/store/authStore";
+import { useThemeStore } from "@/store/themeStore";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import {
@@ -10,22 +11,25 @@ import {
 import Animated, { FadeIn } from "react-native-reanimated";
 import Logo from "../assets/images/logo1.jpeg";
 
-export default function SplashScreen({ isLoading = false, user = null }) {
+export default function SplashScreen() {
   const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
+  const { getColors } = useThemeStore();
+  const colors = getColors();
 
   useEffect(() => {
     const redirectAfterSplash = () => {
       setTimeout(() => {
-       
-          router.replace("/login");
-        
+        if (isAuthenticated) {
+          router.replace("/(root)/dashboard");
+        } else {
+          router.replace("/(auth)/login");
+        }
       }, 2000);
     };
 
-    if (!isLoading) {
-      redirectAfterSplash();
-    }
-  }, [isLoading, user, router]);
+    redirectAfterSplash();
+  }, [isAuthenticated, router]);
 
   const Content = () => (
     <Animated.View
@@ -33,10 +37,10 @@ export default function SplashScreen({ isLoading = false, user = null }) {
       style={styles.logoContainer}
     >
       <Image source={Logo} style={styles.logo} />
-      <Animated.Text entering={FadeIn.delay(500)} style={styles.appName}>
+      <Animated.Text entering={FadeIn.delay(500)} style={[styles.appName, { color: colors.text }]}>
         Grain Technik
       </Animated.Text>
-      <Animated.Text entering={FadeIn.delay(700)} style={styles.tagline}>
+      <Animated.Text entering={FadeIn.delay(700)} style={[styles.tagline, { color: colors.textLight }]}>
         Each grain matters
       </Animated.Text>
     </Animated.View>
@@ -44,14 +48,14 @@ export default function SplashScreen({ isLoading = false, user = null }) {
 
   if (Platform.OS === "web") {
     return (
-      <View style={[styles.container, styles.webGradient]}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Content />
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, styles.nativeGradient]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Content />
     </View>
   );
@@ -60,20 +64,11 @@ export default function SplashScreen({ isLoading = false, user = null }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  webGradient: {
-    backgroundColor: Colors.coffeeTheme.background,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  nativeGradient: {
-    backgroundColor: Colors.coffeeTheme.background,
     justifyContent: "center",
     alignItems: "center",
   },
   logoContainer: {
     alignItems: "center",
-
   },
   logo: {
     width: 120,
@@ -84,12 +79,10 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 32,
     fontWeight: "700",
-    color: Colors.coffeeTheme.text,
     marginBottom: 8,
   },
   tagline: {
     fontSize: 16,
-    color: Colors.coffeeTheme.textLight,
     fontWeight: "500",
   },
 });
