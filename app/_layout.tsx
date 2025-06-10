@@ -5,9 +5,11 @@ import { useThemeStore } from '@/store/themeStore';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { useEffect } from 'react';
-import Toast from "react-native-toast-message";
+import Toast from "react-native-toast-message"
+import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 
 export default function RootLayout() {
+  useFrameworkReady();
   const colorScheme = useColorScheme();
   const { isAuthenticated } = useAuthStore();
   const { isDarkMode, getColors } = useThemeStore();
