@@ -1,4 +1,3 @@
-
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ArrowLeft,
@@ -42,15 +41,20 @@ const settingsOptions = [
   "DATE & TIME",
   "DATA LOG",
   "OPERATING HOURS",
-];
+] as const;
+
+type SettingsOption = (typeof settingsOptions)[number];
 
 export default function DeviceDetailsScreen() {
-  const { id } = useLocalSearchParams();
+  const params = useLocalSearchParams<{ id: string }>();
+  const deviceId = params.id ? parseInt(params.id, 10) : null;
 
   const router = useRouter();
 
   const [currentView, setCurrentView] = useState("menu");
-  const [selectedSetting, setSelectedSetting] = useState<string | null>(null);
+  const [selectedSetting, setSelectedSetting] = useState<SettingsOption | null>(
+    null
+  );
   const [animations] = useState(
     settingsOptions.map(() => new Animated.Value(1))
   );
@@ -151,7 +155,7 @@ export default function DeviceDetailsScreen() {
     }
   };
 
-  const handleSettingSelect = (item: string, index: number) => {
+  const handleSettingSelect = (item: SettingsOption, index: number) => {
     setSelectedSetting(item);
     Animated.sequence([
       Animated.timing(animations[index], {
@@ -241,7 +245,7 @@ export default function DeviceDetailsScreen() {
           <AerationControlView
             mode="WITHOUT_HEATING"
             onBack={() => setCurrentView("aeration_menu")}
-            deviceId={id}
+            deviceId={deviceId}
           />
         );
       case "aeration_with":
@@ -249,7 +253,7 @@ export default function DeviceDetailsScreen() {
           <AerationControlView
             mode="WITH_HEATING"
             onBack={() => setCurrentView("aeration_menu")}
-            deviceId={id}
+            deviceId={deviceId}
           />
         );
       case "input":
@@ -265,7 +269,7 @@ export default function DeviceDetailsScreen() {
       case "output":
         return <OutputView onBack={() => setCurrentView("input")} />;
       case "auto":
-        return <AutoView onBack={() => setCurrentView("menu")} id={id} />;
+        return <AutoView onBack={() => setCurrentView("menu")} id={deviceId} />;
       case "fault":
         return (
           <CurrentFaultsView
@@ -322,7 +326,7 @@ export default function DeviceDetailsScreen() {
   const headerTitle = (() => {
     switch (currentView) {
       case "menu":
-        return `SR.NO.${id}`;
+        return `SR.NO.${deviceId}`;
       case "settings":
         return selectedSetting || "SETTINGS";
       case "aeration_menu":

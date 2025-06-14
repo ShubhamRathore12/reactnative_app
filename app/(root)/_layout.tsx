@@ -5,6 +5,7 @@ import { DrawerToggleButton } from '@react-navigation/drawer';
 import { router } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
 import { Alert, TouchableOpacity } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function AuthLayout() {
   const { user, logout } = useAuthStore();
@@ -45,6 +46,7 @@ export default function AuthLayout() {
   // };
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <Drawer
       screenOptions={{
         headerLeft: () => (
@@ -145,5 +147,6 @@ export default function AuthLayout() {
         }}
       />
     </Drawer>
+    </GestureHandlerRootView>
   );
 }
